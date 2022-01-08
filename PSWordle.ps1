@@ -126,7 +126,7 @@ while ($end -ne $true)
     do
     {
         Clear-Host
-        Write-Output $word
+        #Write-Output $word
         Write-Host "Enter your guesses one per line.  Guesses will be scored when you press Enter."
         $guesses | foreach-object{$result=ScoreWord -Word $word -guess $_}
         if(($guesscount -lt 6) -and ($result -ne $true))

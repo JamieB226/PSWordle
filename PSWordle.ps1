@@ -28,8 +28,10 @@ if($wordfile -eq "")
         }
     }
     $allwords=Invoke-webrequest -Uri "https://github.com/dwyl/english-words/blob/master/words.txt?raw=true"
+    $targetWords=Invoke-webrequest -Uri $WordURL
     $expression="^[a-zA-Z]{$($WordLength)}$"
-    $wordlewords=$allwords.content -split "`n" | where-object {($_ -match $expression) -eq $true}
+    $wordlewords=$targetWords.content -split "`n" | where-object {($_ -match $expression) -eq $true}
+    $allValidWords=$allWords.content -split "`n" | where-object {($_ -match $expression) -eq $true}
 }
 else
 {
@@ -152,7 +154,7 @@ while ($end -ne $true)
         if(($guesscount -lt 6) -and ($result -ne $true))
         {
             $guess=(Read-host).tolower()
-            if($guess -match $expression)
+            if(($guess -match $expression) -and ($guess -in $allValidWords))
             {
                 $guesses+=$guess
                 $guesscount++

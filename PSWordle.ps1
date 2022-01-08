@@ -172,7 +172,7 @@ while ($end -ne $true)
     }
     else
     {
-        Write-Host "`nPSWordle $guesscount/6`n"
+        Write-Host "`nPSWordle $($guesscount-1)/6`n"
         $guesses | foreach-object{$result=ScoreWord -Word $word -guess $_ -ScoreOutput}
     }
 

@@ -6,13 +6,27 @@ param (
     $WordFile="",
     [Parameter()]
     [int]
-    $WordLength=5
+    $WordLength=5,
+    [Parameter()]
+    [ValidateSet("Basic","Hard")]
+    [string]
+    $WordListSize="Basic"
 )
 
 $WordIndex=$WordLength-1
 
 if($wordfile -eq "")
 {
+    switch ($WordListSize) {
+        "Basic" {
+            Write-Output "Using Basic Word List"
+            $WordURL=  "https://raw.githubusercontent.com/dolph/dictionary/master/popular.txt"
+        }
+        Default {
+            Write-Output "Using Hard Word List"
+            $WordURL= "https://github.com/dwyl/english-words/blob/master/words.txt?raw=true"
+        }
+    }
     $allwords=Invoke-webrequest -Uri "https://github.com/dwyl/english-words/blob/master/words.txt?raw=true"
     $expression="^[a-zA-Z]{$($WordLength)}$"
     $wordlewords=$allwords.content -split "`n" | where-object {($_ -match $expression) -eq $true}

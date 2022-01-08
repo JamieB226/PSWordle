@@ -3,19 +3,25 @@
 param (
     [Parameter()]
     [string]
-    $WordFile=""
+    $WordFile="",
+    [Parameter()]
+    [int]
+    $WordLength=5
 )
+
+$WordIndex=$WordLength-1
 
 if($wordfile -eq "")
 {
     $allwords=Invoke-webrequest -Uri "https://github.com/dwyl/english-words/blob/master/words.txt?raw=true"
-    $wordlewords=$allwords.content -split "`n" | where-object {($_ -match "^[a-zA-Z]{6}$") -eq $true}
+    $expression="^[a-zA-Z]{$($WordLength)}$"
+    $wordlewords=$allwords.content -split "`n" | where-object {($_ -match $expression) -eq $true}
 }
 else
 {
     if(Test-Path -Path $WordFile)
     {
-        $wordlewords=get-content $WordFile | where-object {($_ -match "^[a-zA-Z]{6}$") -eq $true}
+        $wordlewords=get-content $WordFile | where-object {($_ -match $expression) -eq $true}
     }
     else
     {
@@ -48,7 +54,7 @@ function ScoreWord
         }
         else
         {
-            0..5 | foreach-object {
+            0..$WordIndex | foreach-object {
                 $bgcolor="black"
                 $fgcolor="white"
                 if($guess[$_] -in $word.ToCharArray())
@@ -61,7 +67,7 @@ function ScoreWord
                     $bgcolor="green"
                     $fgcolor="black"
                 }    
-                if($_ -lt 5)
+                if($_ -lt $WordIndex)
                 {
                     Write-Host -BackgroundColor $bgcolor -ForegroundColor "black" -Object "_" -NoNewline
                     Write-Host -BackgroundColor "black" -ForegroundColor "black" -Object "_" -NoNewline
@@ -75,7 +81,7 @@ function ScoreWord
     }
     else
     {
-        0..5 | foreach-object {
+        0..$WordIndex | foreach-object {
             $bgcolor="black"
             $fgcolor="white"
             if($guess[$_] -in $word.ToCharArray())
@@ -90,7 +96,7 @@ function ScoreWord
             }
             if(!$scoreOutput)
             {
-                if($_ -lt 5)
+                if($_ -lt $WordIndex)
                 {
                     Write-Host -BackgroundColor $bgcolor -ForegroundColor $fgcolor -Object $guess[$_] -NoNewline
                 }
@@ -101,7 +107,7 @@ function ScoreWord
             }
             else 
             {
-                if($_ -lt 5)
+                if($_ -lt $WordIndex)
                 {
                     Write-Host -BackgroundColor $bgcolor -ForegroundColor "black" -Object "_" -NoNewline
                     Write-Host -BackgroundColor "black" -ForegroundColor "black" -Object "_" -NoNewline
@@ -132,7 +138,7 @@ while ($end -ne $true)
         if(($guesscount -lt 6) -and ($result -ne $true))
         {
             $guess=(Read-host).tolower()
-            if($guess -match "^[a-zA-Z]{6}$")
+            if($guess -match $expression)
             {
                 $guesses+=$guess
                 $guesscount++
